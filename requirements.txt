@@ -1,3 +1,0 @@
-jango
-meu sql
-pytu
