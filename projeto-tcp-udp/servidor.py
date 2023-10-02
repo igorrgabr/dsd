@@ -1,6 +1,6 @@
 import socket
 import random
-from game.cifra import criptografar, descriptografar
+from game.criptografia import criptografar, descriptografar
 from game.frase import frase_aleatoria
 from game.romano import int_romano
 from game.imagem import img_dicas
@@ -47,3 +47,4 @@ while not venceu:
     
 print("...decryption.")
 tcp_client_socket.close()
+tcp_server_socket.close()

@@ -1,5 +1,3 @@
-# Cifra de César
-
 def criptografar(texto, deslocamento):
     texto_cifrado = ""
 
