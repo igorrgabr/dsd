@@ -33,17 +33,20 @@ while not venceu and count <= 5:
     
     print(f"\n{tcp_data.decode()}...\n")
 
-    # dicas via UDP e imagens
+    # dicas e imagens via UDP
+    udp_client_socket.sendto(b"img", (udp_host, udp_port))
+    tip_url, udp_server_address = udp_client_socket.recvfrom(1024)
+    
     if venceu:
-        exec_imagem(count, 1)
+        nome = "vincere.png"
     elif count < 5:
-        udp_client_socket.sendto(b"img", (udp_host, udp_port))
-        tip, udp_server_address = udp_client_socket.recvfrom(1024)
-        print(f"consilium {count+1} - {tip.decode()}\n")
-        exec_imagem(count, 0)
+        nome = f"imago{count+1}.png"
     else:
+        nome = "victus.png"
         print("C. L. A. D. E. M.\n")
-        exec_imagem(count, 2)
+
+    if tip_url:
+        exec_imagem(tip_url.decode(), nome)
 
     count += 1
 
