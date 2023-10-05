@@ -8,6 +8,6 @@
 - cd dsd/projeto-tcp-udp
 - pip install -r requeriments.txt
 ### Feito por:
-- Igor Gabriel
-- Cibele Diniz https://github.com/cibelediniz
-- Marcus Vinícius https://github.com/kdtvinicius
+- [Igor Gabriel](https://github.com/igorrgabr)
+- [Cibele Diniz](https://github.com/cibelediniz)
+- [Marcus Vinícius](https://github.com/kdtvinicius)
