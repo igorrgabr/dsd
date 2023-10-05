@@ -1,8 +1,9 @@
 ## Projeto TCP/UDP
 ### Instalação
-- python -m venv projeto
-- projeto\Scripts\activate
+- mkdir projeto
 - cd projeto
+- python -m venv venv
+- venv\Scripts\activate
 - git clone https://github.com/igorrgabr/dsd.git
 - cd dsd/projeto-tcp-udp
 - pip install -r requeriments.txt
