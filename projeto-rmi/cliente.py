@@ -5,10 +5,10 @@ game_server = Pyro4.Proxy(uri)
 game_server.init()
 
 print("Bem-vindo ao Show do Milhão!")
-for question_number in range(5):
+random_questions = game_server.shuffle_and_select_questions()
+
+for question_number, question in enumerate(random_questions):
     print(f"\nPergunta n° {question_number + 1}")
-    
-    question = game_server.get_question(question_number)
     print(question["question"])
     for answer_option in question["answers"]:
         print(answer_option)
@@ -21,7 +21,11 @@ for question_number in range(5):
             print("\nParabéns, você é o mais novo milionário!")
     else:
         print(f"Resposta incorreta. A alternativa correta era {question['correct_answer']}.")
-        print("Fim de jogo! Você receberá metade do prêmio. :(")
+        print("Fim de jogo!")
+        if question_number == 0:
+            print("Você não ganhou nada... :(")
+        else:
+            print("Você ganhou metade do prêmio!")
         break
 
 print(f"\nTotal do prêmio: R$ {game_server.get_prize()}")

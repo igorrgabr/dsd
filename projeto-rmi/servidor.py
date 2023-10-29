@@ -1,4 +1,5 @@
 import Pyro4
+import random
 
 @Pyro4.expose
 class GameServer:
@@ -14,10 +15,10 @@ class GameServer:
                 "answers": [
                     "a) Comunicação assíncrona é mais rápida que a comunicação síncrona.",
                     "b) Comunicação assíncrona envolve a transferência de dados em tempo real, enquanto a comunicação síncrona não.",
-                    "c) Comunicação assíncrona permite que os participantes continuem suas tarefas sem esperar uma resposta imediata, ao passo que a comunicação síncrona exige que todos os participantes estejam",
+                    "c) Comunicação assíncrona permite que os participantes continuem suas tarefas sem esperar uma resposta imediata, ao passo que a comunicação síncrona exige que todos os participantes estejam ativamente envolvidos ao mesmo tempo.",
                     "d) Comunicação assíncrona é uma técnica usada apenas em sistemas centralizados."
                 ],
-                "correct_answer": "C"
+                "correct_answer": "c"
             },
             {
                 "question": "Quem foi o líder da Revolta da Armada, um conflito ocorrido no final do século XIX no Brasil?",
@@ -27,7 +28,7 @@ class GameServer:
                     "c) Almirante Custódio de Melo.",
                     "d) Marechal Floriano Peixoto."
                 ],
-                "correct_answer": "C"
+                "correct_answer": "c"
             },
             {
                 "question": "Qual evento histórico marcou o início da Era Vargas no Brasil?",
@@ -37,7 +38,7 @@ class GameServer:
                     "c) A Guerra dos Farrapos.",
                     "d) O Golpe de Estado de 1937."
                 ],
-                "correct_answer": "D"
+                "correct_answer": "d"
             },
             {
                 "question": "Qual é a principal diferença entre sistemas distribuídos e sistemas centralizados?",
@@ -47,7 +48,7 @@ class GameServer:
                     "c) Sistemas distribuídos são mais rápidos que sistemas centralizados.",
                     "d) Sistemas centralizados são mais seguros do que sistemas distribuídos."
                 ],
-                "correct_answer": "B"
+                "correct_answer": "b"
             },
             {
                 "question": "Quem foi o líder do movimento conhecido como 'Inconfidência Mineira', que ocorreu no final do século XVIII e buscava a independência da Capitania de Minas Gerais do domínio português?",
@@ -57,10 +58,65 @@ class GameServer:
                     "c) Dom João VI.",
                     "d) Tiririca."
                 ],
-                "correct_answer": "A"
+                "correct_answer": "a"
+            },
+            {
+                "question": "Quem é considerado o pai da computação?",
+                "answers": [
+                    "a) Alan Turing.",
+                    "b) Thomas Edison.",
+                    "c) Nikola Tesla.",
+                    "d) Albert Einstein."
+                ],
+                "correct_answer": "a"
+            },
+            {
+                "question": "Qual é o planeta mais próximo do Sol no sistema solar?",
+                "answers": [
+                    "a) Vênus.",
+                    "b) Terra.",
+                    "c) Mercúrio.",
+                    "d) Marte."
+                ],
+                "correct_answer": "c"
+            },
+            {
+                "question": "Quem escreveu a famosa obra 'Dom Quixote'?",
+                "answers": [
+                    "a) Miguel de Cervantes.",
+                    "b) William Shakespeare.",
+                    "c) Charles Dickens.",
+                    "d) Fyodor Dostoevsky."
+                ],
+                "correct_answer": "a"
+            },
+            {
+                "question": "Qual é a capital da França?",
+                "answers": [
+                    "a) Londres.",
+                    "b) Madri.",
+                    "c) Roma.",
+                    "d) Paris."
+                ],
+                "correct_answer": "d"
+            },
+            {
+                "question": "Qual é o maior mamífero terrestre?",
+                "answers": [
+                    "a) Elefante.",
+                    "b) Rinoceronte.",
+                    "c) Hipopótamo.",
+                    "d) Girafa."
+                ],
+                "correct_answer": "a"
             }
         ]
 
+    def shuffle_and_select_questions(self):
+        random.shuffle(self.questions)
+        random_questions = self.questions[:5]
+        return random_questions
+    
     def get_prize(self):
         return self.prize
 
