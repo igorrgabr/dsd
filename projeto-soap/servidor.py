@@ -83,6 +83,6 @@ wsgi_app = WsgiApplication(app)
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
-    server = make_server('127.0.0.1', 1234, wsgi_app)
+    server = make_server('0.0.0.0', 1234, wsgi_app)
     print("Servidor SOAP rodando na porta 1234...")
     server.serve_forever()

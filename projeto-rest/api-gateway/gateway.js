@@ -1,10 +1,5 @@
 /* API Gateway */
 
-// doc
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
-//
-
 // lib
 const express = require('express');
 const axios = require('axios');
@@ -12,34 +7,25 @@ const cors = require('cors');
 const CryptoJS = require('crypto-js');
 //
 
+// doc
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swaggerConfig');
+//
+
 const app = express();
 const PORT = 1234;
 
 app.use(cors());
 
-// Definição Swagger Doc
-const swaggerOptions = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'API Gateway para Marvel e Giphy',
-            version: '1.0.0',
-            description: 'Documentação da API Gateway que integra a Marvel API e a Giphy API.'
-        },
-        servers: [
-            {
-                url: `http://localhost:${PORT}`,
-                description: 'Servidor local',
-            },
-        ],
-    },
-    apis: ['gateway-js'],
-};
-const swaggerSpec = swaggerJSDoc(swaggerOptions);
-//
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Retorna uma mensagem indicando que o API Gateway está rodando.
+ *     responses:
+ *       200:
+ *         description: OK
+ */
 app.get('/', (req, res) => {
     res.send('API Gateway está rodando!');
 });
@@ -47,6 +33,8 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Servidor está rodando na porta ${PORT}`);
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Integração APIs
 const PUBLIC_MARVEL_API_KEY = '057d11d69f444d996536e0bc90bb3cff';
@@ -60,18 +48,24 @@ const hash = CryptoJS.MD5(timestamp + PRIVATE_MARVEL_API_KEY + PUBLIC_MARVEL_API
  * @swagger
  * /char/{charName}:
  *   get:
- *     description: Obtém informações sobre um personagem da Marvel e Gifs relacionados da Giphy.
+ *     summary: Retorna dados de um personagem da Marvel e GIFs relacionados.
  *     parameters:
- *       - name: charName
- *         description: Nome do personagem da Marvel.
- *         in: path
+ *       - in: path
+ *         name: charName
+ *         schema:
+ *           type: string
  *         required: true
- *         type: string
+ *         description: Nome do personagem da Marvel.
  *     responses:
  *       200:
- *         description: Sucesso. Retorna informações do personagem da Marvel e Gifs relacionados.
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             example:
+ *               charData: { Marvel Character Data }
+ *               gifs: { Giphy GIFs Data }
  *       500:
- *         description: Erro interno do servidor.
+ *         description: Erro interno do servidor
  */
 app.get('/char/:charName', async (req, res) => {
     try {

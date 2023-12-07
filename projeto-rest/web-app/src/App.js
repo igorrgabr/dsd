@@ -5,16 +5,14 @@ import './App.css';
 function App() {
   const [charName, setCharName] = useState('');
   const [charData, setCharData] = useState(null);
-  const [gifUrl, setGifUrl] = useState('');
+  const [gifs, setGifs] = useState(null);
   const [error, setError] = useState('');
 
   const fetchCharData = async () => {
     try {
       const response = await axios.get(`http://localhost:1234/char/${charName}`);
-      
       setCharData(response.data.charData[0]);
-      const index = Math.floor(Math.random() * 50);
-      response.data.charData[0] ? setGifUrl(response.data.gifs[index].images.original.url) : setGifUrl('');
+      response.data.charData[0] ? setGifs(response.data.gifs) : setGifs(null);
       response.data.charData[0] ? setError('') : setError('Personagem não encontrado.');
     } catch (error) {
       console.error(error);
@@ -23,23 +21,39 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <h1>Marvel Character Explorer</h1>
-      <label>
-        Character's Name:
-        <input type="text" value={charName} onChange={(e) => setCharName(e.target.value)} />
-      </label>
-      <button onClick={fetchCharData}>Search</button>
+    <div className="container">
+      <div className="header">
+      <img src="/images/header.jpg" alt="Marvel Logo" draggable="false" />
+      </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div className="search-container">
+        <input
+          className="search-input"
+          type="text"
+          value={charName}
+          onChange={(e) => setCharName(e.target.value)}
+          placeholder="Enter the name of the character (or group)"
+        />
+        <button className="search-button" onClick={fetchCharData}>
+          Search
+        </button>
+      </div>
+
+      {error && <p className="error-message">{error}</p>}
 
       {charData && (
-        <div>
+        <div className="result-container">
           <h2>{charData.name}</h2>
-          <p>{charData.description}</p>
           <img src={`${charData.thumbnail.path}.${charData.thumbnail.extension}`} alt={charData.name} />
-
-          {gifUrl && <img src={gifUrl} alt="GIF relacionado ao personagem" />}
+          <p className="character-info">{charData.description}</p>
+          
+          <div className="gif-container">
+            {gifs && gifs.slice(0, 12).map((gif) => (
+              <div className="gif-item">
+                <img src={gif.images.original.url} alt="GIF relacionado ao personagem" />
+              </div>
+            ))
+          }</div>
         </div>
       )}
     </div>
