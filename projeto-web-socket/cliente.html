@@ -9,33 +9,46 @@
   <h1>WebSocket Client</h1>
   <input type="file" id="fileInput">
   <button onclick="sendFile()">Enviar Arquivo</button>
-
   <script>
     const socket = new WebSocket('ws://localhost:3000');
-
+  
     socket.addEventListener('open', (event) => {
       console.log('Conectado ao servidor WebSocket.');
     });
-
+  
     socket.addEventListener('message', (event) => {
-      console.log('Mensagem do servidor:', event.data);
+      if (typeof event.data === 'string') {
+        console.log('Mensagem do servidor:', event.data);
+      } else if (event.data instanceof ArrayBuffer) {
+        const uint8Array = new Uint8Array(event.data);
+        const blob = new Blob([uint8Array]);
+        const blobURL = URL.createObjectURL(blob);
+  
+        const link = document.createElement('a');
+        link.href = blobURL;
+        link.download = 'arquivo_recebido';
+        document.body.appendChild(link);
+        link.click();
+  
+        URL.revokeObjectURL(blobURL);
+      }
     });
-
+  
     socket.addEventListener('close', (event) => {
       console.log('Conexão fechada.');
     });
-
+  
     function sendFile() {
       const fileInput = document.getElementById('fileInput');
       const file = fileInput.files[0];
-
+  
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const fileContent = e.target.result;
           socket.send(fileContent);
         };
-
+  
         reader.readAsArrayBuffer(file);
       } else {
         console.log('Selecione um arquivo.');
