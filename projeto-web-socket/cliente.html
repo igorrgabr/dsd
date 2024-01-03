@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Client</title>
+</head>
+<body>
+  <h1>WebSocket Client</h1>
+  <input type="file" id="fileInput">
+  <button onclick="sendFile()">Enviar Arquivo</button>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:3000');
+
+    socket.addEventListener('open', (event) => {
+      console.log('Conectado ao servidor WebSocket.');
+    });
+
+    socket.addEventListener('message', (event) => {
+      console.log('Mensagem do servidor:', event.data);
+    });
+
+    socket.addEventListener('close', (event) => {
+      console.log('Conexão fechada.');
+    });
+
+    function sendFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fileContent = e.target.result;
+          socket.send(fileContent);
+        };
+
+        reader.readAsArrayBuffer(file);
+      } else {
+        console.log('Selecione um arquivo.');
+      }
+    }
+  </script>
+</body>
+</html>
