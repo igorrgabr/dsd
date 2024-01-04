@@ -1,43 +1,55 @@
 const WebSocket = require('ws');
 const http = require('http');
-const fs = require('fs');
+const express = require('express');
+const path = require('path');
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('WebSocket server is running.');
-});
-
+const app = express();
+const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+const PORT = process.env.PORT || 3000;
+
+const users = [];
+
 wss.on('connection', (ws) => {
-  console.log('Cliente conectado.');
+    let user = {};
 
-  ws.on('message', (message) => {
-    console.log('Mensagem recebida:', message);
+    ws.on('message', (message) => {
+        const data = JSON.parse(message);
 
-    if (fs.existsSync(message)) {
-      const fileStream = fs.createReadStream(message);
-      fileStream.on('data', (chunk) => {
-        // Envie os dados do arquivo como um Buffer
-        ws.send(chunk);
-      });
+        switch (data.type) {
+            case 'join':
+                user = { id: ws._socket.remoteAddress, username: data.username, color: data.color };
+                users.push(user);
+                broadcastUserList();
+                break;
+            case 'draw':
+                broadcast(message);
+                break;
+        }
+    });
 
-      fileStream.on('end', () => {
-        // Feche a conexão após o envio completo do arquivo
-        ws.send('Fechando conexão. Arquivo enviado com sucesso.');
-        ws.close();
-      });
-    } else {
-      ws.send('Arquivo não encontrado.');
-    }
-  });
-
-  ws.on('close', () => {
-    console.log('Cliente desconectado.');
-  });
+    ws.on('close', () => {
+        users.splice(users.indexOf(user), 1);
+        broadcastUserList();
+    });
 });
 
-const PORT = 3000;
+function broadcast(message) {
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+}
+
+function broadcastUserList() {
+    const userListMessage = JSON.stringify({ type: 'userList', users });
+    broadcast(userListMessage);
+}
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 server.listen(PORT, () => {
-  console.log(`Servidor HTTP e WebSocket ouvindo na porta ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
