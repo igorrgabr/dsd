@@ -9,10 +9,17 @@ const wss = new WebSocket.Server({ server });
 
 const PORT = process.env.PORT || 3000;
 
-const users = [];
+const users = []; // usuários
+const drawingHistory = []; // histórico de desenhos
 
 wss.on('connection', (ws) => {
     let user = {};
+
+    // envia o histórico de desenhos para o novo usuário
+    if (drawingHistory.length > 0) {
+        const drawingHistoryMessage = JSON.stringify({ type: 'drawingHistory', history: drawingHistory });
+        ws.send(drawingHistoryMessage);
+    }
 
     ws.on('message', (message) => {
         const data = JSON.parse(message);
@@ -24,6 +31,12 @@ wss.on('connection', (ws) => {
                 broadcastUserList();
                 break;
             case 'draw':
+                drawingHistory.push(data); // add desenho ao histórico
+                broadcast(message);
+                break;
+            case 'clearCanvas':
+                // limpa o histórico para todos os usuários
+                drawingHistory.length = 0;
                 broadcast(message);
                 break;
         }
@@ -51,5 +64,5 @@ function broadcastUserList() {
 app.use(express.static(path.join(__dirname, 'public')));
 
 server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });

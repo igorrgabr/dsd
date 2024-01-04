@@ -2,11 +2,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const userList = document.getElementById('user-list');
+    const clearButton = document.getElementById('clear-btn');
 
     let username = prompt('Digite seu nome:');
     let color = getRandomColor();
 
-    const ws = new WebSocket('ws://localhost:3000');
+    const ws = new WebSocket('ws://localhost:3000'); // conexão websocket
 
     ws.onopen = () => {
         ws.send(JSON.stringify({ type: 'join', username, color }));
@@ -14,44 +15,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ws.onmessage = (event) => {
         const data = event.data;
-    
-        // Verificar se o conteúdo recebido é um Blob
-        if (data instanceof Blob) {
-            // Ler o conteúdo do Blob como texto
+
+        // tipo da mensagem é string ou blob?
+        if (typeof data === 'string') {
+            try {
+                const jsonData = JSON.parse(data);
+
+                if (jsonData.type === 'drawingHistory') {
+                    // desenha elementos do histórico
+                    jsonData.history.forEach((drawData) => {
+                        drawLine(drawData.startX, drawData.startY, drawData.endX, drawData.endY, drawData.color);
+                    });
+                } else {
+                    handleWebSocketData(jsonData);
+                }
+            } catch (error) {
+                console.error('Erro ao analisar JSON:', error);
+            }
+        } else if (data instanceof Blob) {
+            // se for blob, lê o conteúdo como texto
             data.text().then((text) => {
-                // Tentar analisar o texto como JSON
                 try {
                     const jsonData = JSON.parse(text);
                     handleWebSocketData(jsonData);
                 } catch (error) {
-                    console.error('Erro ao analisar JSON:', error);
+                    console.error('Erro ao analisar JSON do Blob:', error);
                 }
             });
         } else {
-            // Se não for um Blob, tentar analisar como JSON imediatamente
-            try {
-                const jsonData = JSON.parse(data);
-                handleWebSocketData(jsonData);
-            } catch (error) {
-                console.error('Erro ao analisar JSON:', error);
-            }
+            console.error('Tipo de mensagem não suportado:', typeof data);
         }
     };
-
-    function handleWebSocketData(data) {
-        switch (data.type) {
-            case 'draw':
-                drawLine(data.startX, data.startY, data.endX, data.endY, data.color);
-                break;
-            case 'userList':
-                updateUsersList(data.users);
-                break;
-        }
-    }
 
     canvas.addEventListener('mousedown', startDrawing);
     canvas.addEventListener('mouseup', stopDrawing);
     canvas.addEventListener('mousemove', draw);
+
+    clearButton.addEventListener('click', clearCanvas);
 
     let drawing = false;
     let lastX = 0;
@@ -89,6 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.closePath();
     }
 
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ws.send(JSON.stringify({ type: 'clearCanvas' }));
+    }
+
     function updateUsersList(users) {
         userList.innerHTML = '';
         users.forEach(user => {
@@ -97,6 +102,21 @@ document.addEventListener('DOMContentLoaded', () => {
             li.textContent = user.username;
             userList.appendChild(li);
         });
+    }
+
+    // envio p/ servidor
+    function handleWebSocketData(data) {
+        switch (data.type) {
+            case 'draw':
+                drawLine(data.startX, data.startY, data.endX, data.endY, data.color);
+                break;
+            case 'userList':
+                updateUsersList(data.users);
+                break;
+            case 'clearCanvas':
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                break;
+        }
     }
 
     function getRandomColor() {
