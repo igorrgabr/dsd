@@ -1,16 +1,20 @@
-import pika
+import queue
+import time
 
-def callback(ch, method, properties, body):
-    print(f"Recebido: {body}")
+class Consumer:
+    def __init__(self, fila_mensagens):
+        self.fila_mensagens = fila_mensagens
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel()
+    def processar_mensagens(self):
+        while True:
+            mensagem = self.fila_mensagens.get()
+            print(f"Consumidor recebeu: {mensagem}")
+            # Aqui você pode adicionar lógica para processar a mensagem
+            time.sleep(2)
+            self.fila_mensagens.task_done()
 
-channel.queue_declare(queue='fila_exemplo')
-
-channel.basic_consume(queue='fila_exemplo',
-                      on_message_callback=callback,
-                      auto_ack=True)
-
-print("Aguardando mensagens. Para sair, pressione Ctrl+C")
-channel.start_consuming()
+# Se estiver executando este arquivo individualmente
+if __name__ == "__main__":
+    fila_mensagens = queue.Queue()
+    consumer = Consumer(fila_mensagens)
+    consumer.processar_mensagens()

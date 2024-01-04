@@ -1,13 +1,20 @@
-import pika
+import threading
+import queue
+import time
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel()
+class Publisher:
+    def __init__(self, fila_mensagens):
+        self.fila_mensagens = fila_mensagens
 
-channel.queue_declare(queue='fila_exemplo')
+    def enviar_mensagens(self):
+        for i in range(5):
+            mensagem = f"Mensagem {i}"
+            self.fila_mensagens.put(mensagem)
+            print(f"Produtor enviou: {mensagem}")
+            time.sleep(1)
 
-channel.basic_publish(exchange='',
-                      routing_key='fila_exemplo',
-                      body='Mensagem de exemplo')
-
-print("Mensagem enviada")
-connection.close()
+# Se estiver executando este arquivo individualmente
+if __name__ == "__main__":
+    fila_mensagens = queue.Queue()
+    publisher = Publisher(fila_mensagens)
+    publisher.enviar_mensagens()
