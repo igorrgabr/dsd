@@ -1,20 +1,30 @@
-import threading
-import queue
-import time
+import pika
+import json
 
-class Publisher:
-    def __init__(self, fila_mensagens):
-        self.fila_mensagens = fila_mensagens
+cloudamqp_url = "amqps://gjmcunrj:dGqU85f85QKJF33Azx8voAmxBeM2Q8CY@jackal.rmq.cloudamqp.com/gjmcunrj"
+params = pika.URLParameters(cloudamqp_url)
+connection = pika.BlockingConnection(params)
+channel = connection.channel()
 
-    def enviar_mensagens(self):
-        for i in range(5):
-            mensagem = f"Mensagem {i}"
-            self.fila_mensagens.put(mensagem)
-            print(f"Produtor enviou: {mensagem}")
-            time.sleep(1)
+channel.exchange_declare(exchange='leilao', exchange_type='fanout')
 
-# Se estiver executando este arquivo individualmente
+def publish_new_art():
+    nome = input("Nome da arte: ")
+    imagem = input("URL da imagem: ")
+    valor_inicial = float(input("Valor inicial: "))
+
+    nova_arte = {"nome": nome, "img": imagem, "valor_inicial": valor_inicial}
+    message = json.dumps(nova_arte)
+
+    channel.basic_publish(exchange='leilao', routing_key='', body=message)
+    print(f"Nova arte '{nome}' publicada para leilão")
+
 if __name__ == "__main__":
-    fila_mensagens = queue.Queue()
-    publisher = Publisher(fila_mensagens)
-    publisher.enviar_mensagens()
+    while True:
+        user_choice = input("Deseja publicar uma nova arte? (s/n): ").lower()
+        if user_choice != 's':
+            break
+
+        publish_new_art()
+
+    connection.close()

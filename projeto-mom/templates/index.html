@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta http-equiv="refresh" content="10">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Leilão de Artes</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                text-decoration: none;
+                list-style-type: none;
+                box-sizing: border-box;
+            }
+            body {
+                padding-top: 1vw;
+                display: grid;
+                place-items: center;
+            }
+            #leilao {
+                gap: 1vw;
+            }
+            #leilao ul {
+                gap: 1vw;
+            }
+            #leilao, #leilao ul, #leilao ul li {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            #leilao img {
+                width: 20vw;
+                height: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="leilao">
+            <h1>Leilão de Artes</h1>
+            <ul id="artes"></ul>
+            {% for art in arts %}
+                <strong>{{ art.nome }}</strong>
+                <img src="{{ art.img }}" alt="img arte">
+                Valor Inicial: {{ art.valor_inicial|format_money }}
+            {% endfor %}
+        </div>
+    </body>
+</html>
